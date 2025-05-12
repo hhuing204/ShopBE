@@ -7,7 +7,7 @@ load_dotenv()
 AIO_USER = os.getenv("AIO_USERNAME")
 AIO_KEY = os.getenv("AIO_KEY")
 AIO_HOST = os.getenv("AIO_HOST", "io.adafruit.com")
-AIO_PORT = int(os.getenv("AIO_PORT", 1883))
+AIO_PORT = int(os.getenv("AIO_PORT", 1883)) # hoặc thử gọi 8883 nếu ko kết nối đc
 
 AIO_FEED_IDs = ["1", "Failure", "Unknow"]
 
@@ -15,6 +15,8 @@ AIO_FEED_IDs = ["1", "Failure", "Unknow"]
 client = mqtt.Client()
 client.username_pw_set(AIO_USER, AIO_KEY)
 client.connect(AIO_HOST, AIO_PORT, 60)
+#client.loop_start() 
+#loop
 
 def publish_result(result: str):
     # Reset all
