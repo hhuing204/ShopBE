@@ -4,7 +4,7 @@ import uuid, json
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-NUM_FRAMES = 50
+NUM_FRAMES = 10
 FRAME_DELAY = 0.2  # 200ms giữa mỗi ảnh
 CASCADE_PATH = os.path.join(BASE_DIR, "haarcascade_frontalface_default.xml")
 MAC_MAP_PATH = os.path.join(BASE_DIR, "mac_map.json")
