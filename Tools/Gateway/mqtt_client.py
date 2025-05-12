@@ -15,6 +15,7 @@ AIO_FEED_IDs = ["1", "Failure", "Unknow"]
 client = mqtt.Client()
 client.username_pw_set(AIO_USER, AIO_KEY)
 client.connect(AIO_HOST, AIO_PORT, 60)
+client.loop_start() #loop
 
 def publish_result(result: str):
     # Reset all
