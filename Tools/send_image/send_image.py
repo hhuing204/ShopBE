@@ -9,19 +9,9 @@ FRAME_DELAY = 0.2  # 200ms giữa mỗi ảnh
 CASCADE_PATH = os.path.join(BASE_DIR, "haarcascade_frontalface_default.xml")
 MAC_MAP_PATH = os.path.join(BASE_DIR, "mac_map.json")
 
-# Lấy MAC address
-mac = ':'.join(['{:02x}'.format((uuid.getnode() >> ele) & 0xff)
-                for ele in range(0,8*6,8)][::-1])
 
 
-# Đọc ánh xạ từ file JSON
-try:
-    with open(MAC_MAP_PATH) as f:
-        mac_to_shop = json.load(f)
-except FileNotFoundError:
-    mac_to_shop = {}
-
-shop_id = mac_to_shop.get(mac.lower(), "unknown")
+shop_id = "c4596303-de42-424b-afcb-ea5be63ab060"
 
 def send_image ():
     face_cascade = cv2.CascadeClassifier(CASCADE_PATH)
