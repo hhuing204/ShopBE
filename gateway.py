@@ -7,18 +7,40 @@ app = Flask(__name__)
 
 @app.route('/check_face', methods=['POST'])
 def check_face_route():
-    data = request.get_json()
-    if not data or 'images' not in data or 'shop_id' not in data:
-        return jsonify({'error': 'Missing data'}), 400
+    # data = request.get_json()
+    # if not data or 'images' not in data or 'shop_id' not in data:
+    #     return jsonify({'error': 'Missing data'}), 400
+    
+    if 'shop_id' not in request.form:
+        return jsonify({'error': 'Missing shop_id'}), 400
+
+    shop_id = request.form['shop_id']
+    uploaded_files = request.files.getlist("images")
+
+    if not uploaded_files:
+        return jsonify({'error': 'No images provided'}), 400
 
     results = []
 
-    for img_b64 in data['images']:
-        img = decode_base64_image(img_b64)
-        if img is not None:
-            # save_image(img, data['shop_id'], prefix="input")
-            result = face_check(img, data['shop_id'])
-            results.append(result)
+    # for img_b64 in data['images']:
+    #     img = decode_base64_image(img_b64)
+    #     if img is not None:
+    #         save_image(img, data['shop_id'], prefix="input")
+    #         result = face_check(img_b64, data['shop_id'])
+    #         results.append(result)
+    
+    for file in uploaded_files:
+        img_np = np.frombuffer(file.read(), np.uint8)
+        img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+        if img is None:
+            continue
+
+        # (Tùy chọn) Lưu ảnh
+        save_image(img, shop_id)
+
+        # Gọi nhận diện khuôn mặt
+        result = face_check(img, shop_id)
+        results.append(result)
 
     final = max(set(results), key=results.count) if results else "unknown"
     publish_result(final)

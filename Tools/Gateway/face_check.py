@@ -1,25 +1,28 @@
+
+    
 import cv2
 import numpy as np
-import base64
 import requests
+from io import BytesIO
 
 def face_check(image: np.ndarray, shop_id: str) -> str:
-    #gọi api BE postgre để check
-    # return "failure" #sửa thep api BE
-    """
     try:
-        # Encode image to base64
-        _, buffer = cv2.imencode('.jpg', image)
-        img_base64 = base64.b64encode(buffer).decode('utf-8')
+        url = f"http://localhost:8085/api/v1/user/check-in/{shop_id}"
 
-        # Prepare payload
-        payload = {
-            "shop_id": shop_id,
-            "image": img_base64
+        # Encode ảnh (giống lưu ra file, nhưng lưu vào RAM)
+        success, encoded_img = cv2.imencode('.jpg', image)
+        if not success:
+            print("❌ Không encode được ảnh")
+            return "failure"
+
+        img_bytes = BytesIO(encoded_img.tobytes())  # RAM-based file
+        img_bytes.name = "image.jpg"  # Quan trọng: requests cần .name để hiểu MIME
+
+        files = {
+            "image_file": ("image.jpg", img_bytes, "image/jpeg")
         }
 
-        # Send POST request to backend API
-        response = requests.post("http://your-backend-api/face-check", json=payload)
+        response = requests.post(url, files=files)
 
         if response.status_code == 200:
             result = response.json()
@@ -28,10 +31,13 @@ def face_check(image: np.ndarray, shop_id: str) -> str:
             else:
                 return "failure"
         else:
+            print("⚠️ API lỗi mã:", response.status_code)
             return "failure"
+
     except Exception as e:
-        print(f"Error during face check: {e}")
+        print(f"❌ Lỗi trong face_check: {e}")
         return "failure"
-    """
-    import random
-    return random.choice(["success", "failure", "unknown"])
+
+        
+    # import random
+    # return random.choice(["success", "failure", "unknown"])

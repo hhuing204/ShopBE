@@ -4,57 +4,61 @@ import uuid, json
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-NUM_FRAMES = 10
+NUM_FRAMES = 1
 FRAME_DELAY = 0.2  # 200ms giữa mỗi ảnh
 CASCADE_PATH = os.path.join(BASE_DIR, "haarcascade_frontalface_default.xml")
-MAC_MAP_PATH = os.path.join(BASE_DIR, "mac_map.json")
 
+files = {
+    "images": open("image/avatar.png", "rb") 
+}
 
-
-shop_id = "c4596303-de42-424b-afcb-ea5be63ab060"
+data = {
+    "shop_id": "c4596303-de42-424b-afcb-ea5be63ab060"
+}
+# shop_id = "c4596303-de42-424b-afcb-ea5be63ab060"
 
 def send_image ():
-    face_cascade = cv2.CascadeClassifier(CASCADE_PATH)
-    cap = cv2.VideoCapture(0)
-    frames = []
+    # face_cascade = cv2.CascadeClassifier(CASCADE_PATH)
+    # cap = cv2.VideoCapture(0)
+    # frames = []
     # cv2.imshow("Camera", cap.read())
 
-    print(f"Đang lấy {NUM_FRAMES} ảnh từ camera...")
+    print(f"Đang lấy {NUM_FRAMES} ảnh từ file...")
 
-    for i in range(NUM_FRAMES):
-        ret, frame = cap.read()
-        if not ret:
-            print(f"Không lấy được ảnh {i+1}")
-            continue
+    # for i in range(NUM_FRAMES):
+    #     ret, frame = cap.read()
+    #     if not ret:
+    #         print(f"Không lấy được ảnh {i+1}")
+    #         continue
         
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+    #     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
         
-        for (x, y, w, h) in faces:
-            # Vẽ khung lên màn hình
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    #     for (x, y, w, h) in faces:
+    #         # Vẽ khung lên màn hình
+    #         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-            # Cắt ảnh mặt
-            face_img = frame[y:y + h, x:x + w]
-            _, buffer = cv2.imencode('.jpg', face_img)
-            img_b64 = base64.b64encode(buffer).decode()
-            frames.append(img_b64)
+    #         # Cắt ảnh mặt
+    #         face_img = frame[y:y + h, x:x + w]
+    #         _, buffer = cv2.imencode('.jpg', face_img)
+    #         img_b64 = base64.b64encode(buffer).decode()
+    #         frames.append(img_b64)
             
-        cv2.imshow("Check_face", frame)
-        if cv2.waitKey(1) == ord('q'):
-            break
-        time.sleep(FRAME_DELAY)
+    #     cv2.imshow("Check_face", frame)
+    #     if cv2.waitKey(1) == ord('q'):
+    #         break
+    #     time.sleep(FRAME_DELAY)
 
-    cap.release()
-    cv2.destroyAllWindows()
+    # cap.release()
+    # cv2.destroyAllWindows()
 
     print("Gửi ảnh lên Gateway...")
 
-    payload = {
-        "images": frames,
-        "shop_id": shop_id
-    }
+    # payload = {
+    #     "images": frames,
+    #     "shop_id": shop_id
+    # }
 
-    res = requests.post("http://localhost:5000/check_face", json=payload)
+    res = requests.post("http://localhost:5000/check_face", files=files, data=data)
     print("Phản hồi từ Gateway:", res.json())
     return res
