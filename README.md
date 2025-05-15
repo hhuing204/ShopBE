@@ -1,4 +1,5 @@
 ## Cấu trúc hệ thống
+```bash
 project_root/
 ├── main.py # File chính, chạy gateway + xử lý nhận diện
 ├── gateway.py # Flask server nhận ảnh, gọi face_check
@@ -14,6 +15,7 @@ project_root/
 ├── dataset/ # Ảnh được lưu tạm để huấn luyện / kiểm tra
 ├── .env # Chứa AIO_USERNAME, AIO_KEY, AIO_HOST...
 └── requirements.txt # Thư viện Python cần cài
+```
 ## Cách chạy hệ thống
 
 ### 1. Cài thư viện cần thiết

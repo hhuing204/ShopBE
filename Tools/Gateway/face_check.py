@@ -1,43 +1,49 @@
 
-    
+import os    
 import cv2
 import numpy as np
 import requests
 from io import BytesIO
 
-def face_check(image: np.ndarray, shop_id: str) -> str:
+    
+
+def face_check(image, shop_id: str, test_mode=False) -> str:
     try:
         url = f"http://localhost:8085/api/v1/user/check-in/{shop_id}"
 
-        # Encode ảnh (giống lưu ra file, nhưng lưu vào RAM)
-        success, encoded_img = cv2.imencode('.jpg', image)
-        if not success:
-            print("❌ Không encode được ảnh")
-            return "failure"
+        if test_mode:
+            # Lấy ảnh test từ file
+            CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+            ROOT_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
+            image_path = os.path.join(ROOT_DIR, "image", "avatar.png")
 
-        img_bytes = BytesIO(encoded_img.tobytes())  # RAM-based file
-        img_bytes.name = "image.jpg"  # Quan trọng: requests cần .name để hiểu MIME
+            with open(image_path, "rb") as f:
+                files = {
+                    "image_file": ("avatar.png", f, "image/png")
+                }
+                response = requests.post(url, files=files)
+        else:
+            # Encode ảnh từ numpy array (OpenCV)
+            success, encoded_img = cv2.imencode('.jpg', image)
+            if not success:
+                print(" Không thể encode ảnh")
+                return "failure"
 
-        files = {
-            "image_file": ("image.jpg", img_bytes, "image/jpeg")
-        }
+            img_bytes = BytesIO(encoded_img.tobytes())
+            img_bytes.name = "image.jpg"
 
-        response = requests.post(url, files=files)
+            files = {
+                "image_file": (img_bytes.name, img_bytes, "image/jpeg")
+            }
+            response = requests.post(url, files=files)
 
         if response.status_code == 200:
             result = response.json()
-            if result.get("status") == "success":
-                return "success"
-            else:
-                return "failure"
+            return result.get("status", "unknown")
         else:
-            print("⚠️ API lỗi mã:", response.status_code)
+            print(" API lỗi mã:", response.status_code)
             return "failure"
 
     except Exception as e:
-        print(f"❌ Lỗi trong face_check: {e}")
+        print(f" Lỗi trong face_check: {e}")
         return "failure"
-
-        
-    # import random
-    # return random.choice(["success", "failure", "unknown"])
